@@ -69,8 +69,8 @@ def login_for_access_token(
             detail="Incorrect username or passwrod",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    access_token_expires = timedelta(minutes=20)
+    print("it is authentication")
+    access_token_expires = timedelta(minutes=1440)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
@@ -83,12 +83,25 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=1440)
 
     to_encode.update({"exp": expire})
 
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
     return encoded_jwt
+
+
+def get_user_by_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user = payload.get("sub")
+        if user is None:
+            raise HTTPException(
+                status_code=403, detail="Token is invalid please login again"
+            )
+        return user
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Token is invalid or expired")
 
 
 def verify_token(token: str = Depends(oauth2_bearer)):
@@ -105,4 +118,5 @@ def verify_token(token: str = Depends(oauth2_bearer)):
 @router.get("/verify_token/{token}")
 async def verify_user_token(token: str):
     verify_token(token=token)
+    print("giriyo")
     return {"Message": "Token is valid"}

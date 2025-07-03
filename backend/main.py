@@ -1,9 +1,9 @@
-from typing import Annotated
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, Session
+from sqlmodel import SQLModel
 import uvicorn
 import auth
+import books
 from database import engine
 
 SQLModel.metadata.create_all(engine)
@@ -19,25 +19,11 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,            # or ["*"] for all origins (not secure for production)
+    allow_origins=origins,  # or ["*"] for all origins (not secure for production)
     allow_credentials=True,
-    allow_methods=["*"],              # GET, POST, PUT, DELETE, etc.
-    allow_headers=["*"],              # Authorization, Content-Type, etc.
+    allow_methods=["*"],  # GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],  # Authorization, Content-Type, etc.
 )
 
 app.include_router(auth.router)
-
-
-def get_db():
-    with Session(engine) as session:
-        yield session
-
-
-db_dependency = Annotated[Session, fastapi.Depends(get_db)]
-
-
-@app.get("/")
-def get_user(user: None, db: db_dependency):
-    if user is None:
-        raise fastapi.HTTPException(status_code=401, detail="Authentication Failes")
-    return {"User": user}
+app.include_router(books.router)

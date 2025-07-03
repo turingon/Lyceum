@@ -1,5 +1,6 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "./api";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,21 +16,18 @@ function Login() {
         const response = await fetch(
           `http://localhost:8000/auth/verify_token/${token}`,
         );
-
-        if (response.ok) {
-          setLoading(true)
-          navigate("/protected");
+        if(response.ok){
+          navigate("/settings")
         }
-
         if (!response.ok) {
           throw new Error("Token verification failed");
         }
       } catch (error) {
+        console.log(error);
         localStorage.removeItem("token");
         navigate("/");
       }
     };
-
     verifyToken();
   }, [navigate]);
 
@@ -61,11 +59,12 @@ function Login() {
       });
 
       setLoading(false);
-
+      console.log(response);
       if (response.ok) {
         const data = await response.json();
+
         localStorage.setItem("token", data.access_token);
-        navigate("/protected");
+        navigate("/settings");
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Authentication failed!");
