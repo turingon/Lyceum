@@ -15,6 +15,12 @@ app = fastapi.FastAPI()
 
 origins = [
     "http://localhost:5173",
+    "https://lyceum.com",
+    "http://lyceum.com",
+    "https://test.turingon.tech",
+    "http://test.turingon.tech",
+    "https://lyceum.turingon.tech",
+    "http://lyceum.turingon.tech",
 ]
 
 app.add_middleware(
