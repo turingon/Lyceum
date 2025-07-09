@@ -7,9 +7,7 @@ function Rooms({ refreshKey, triggerRefresh }) {
 
   const fetchRooms = async () => {
     const token = localStorage.getItem("token");
-    const response = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const response = await api.get(`/books/get_rooms/${token}`);
     setRooms(response.data);
   };
 
@@ -57,8 +55,6 @@ function Bookcases({ refreshKey }) {
   const [rooms, setRooms] = useState([]);
   const [selected, setSelected] = useState("room");
 
-  const token = localStorage.getItem("token");
-
   const handleChange = async (e) => {
     const value = e.target.value;
     await setSelected(value);
@@ -67,12 +63,10 @@ function Bookcases({ refreshKey }) {
   const fetchCases = async (selected) => {
     const token = localStorage.getItem("token");
     const response = await api.get(
-      `http://localhost:8000/books/get_bookcases/${token}/room/${selected}`,
+      `/books/get_bookcases/${token}/room/${selected}`,
     );
     setCases(response.data);
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
   };
   const handleDelete = (id) => async (event) => {
@@ -142,15 +136,13 @@ function Book({ refreshKey }) {
   const fetchBooks = async (selectedRoom, selectedCase) => {
     const token = localStorage.getItem("token");
     const response = await api.get(
-      `http://localhost:8000/books/get_books/${token}/room/${selectedRoom}/case/${selectedCase}`,
+      `/books/get_books/${token}/room/${selectedRoom}/case/${selectedCase}`,
     );
     setBooks(response.data);
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
     const cases = await api.get(
-      `http://localhost:8000/books/get_bookcases/${token}/room/${selectedRoom}`,
+      `/books/get_bookcases/${token}/room/${selectedRoom}`,
     );
 
     setBookcases(cases.data);
@@ -276,9 +268,7 @@ function AddBookcase({ triggerRefresh }) {
   };
   const fetchCases = async () => {
     const token = localStorage.getItem("token");
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
   };
 
@@ -382,12 +372,10 @@ function AddBook({ triggerRefresh }) {
   };
   const fetchBooks = async (selectedRoom, setSelectedBookcase) => {
     const token = localStorage.getItem("token");
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
     const bookcases = await api.get(
-      `http://localhost:8000/books/get_bookcases/${token}/room/${selectedRoom}`,
+      `/books/get_bookcases/${token}/room/${selectedRoom}`,
     );
 
     setBookcases(bookcases.data);
@@ -548,9 +536,7 @@ function UpdateRoom({ triggerRefresh, refreshKey }) {
 
   const fetchCases = async () => {
     const token = localStorage.getItem("token");
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
   };
 
@@ -616,12 +602,10 @@ function UpdateBookcase({ triggerRefresh, refreshKey }) {
   };
   const fetchBooks = async (selectedRoom, setSelectedBookcase) => {
     const token = localStorage.getItem("token");
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
     const bookcases = await api.get(
-      `http://localhost:8000/books/get_bookcases/${token}/room/${selectedRoom}`,
+      `/books/get_bookcases/${token}/room/${selectedRoom}`,
     );
 
     setBookcases(bookcases.data);
@@ -725,13 +709,11 @@ function UpdateBook({ triggerRefresh, refreshKey }) {
   const fetchBooks = async (selectedRoom, selectedBookcase, selectedBook) => {
     const token = localStorage.getItem("token");
 
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
 
     const bookcases = await api.get(
-      `http://localhost:8000/books/get_bookcases/${token}/room/${selectedRoom}`,
+      `/books/get_bookcases/${token}/room/${selectedRoom}`,
     );
     setBookcases(bookcases.data);
 
