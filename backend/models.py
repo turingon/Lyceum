@@ -26,7 +26,7 @@ class Books(SQLModel, table=True):
     bookcase_id: str = Field(String)
     name: str = Field(String)
     content: bytes = Field(sa_column=Column(LargeBinary))
-    image:bytes = Field(sa_column=Column(LargeBinary))
+    image: bytes = Field(sa_column=Column(LargeBinary))
     status: str = Field(String)
 
 
@@ -35,5 +35,5 @@ class UpdateRoom(SQLModel):
 
 
 class UpdateBook(SQLModel):
-    name:str 
-    status:str
+    name: str
+    status: str

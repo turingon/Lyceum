@@ -9,12 +9,13 @@ from database import engine
 SQLModel.metadata.create_all(engine)
 
 if __name__ == "__main__":
-    uvicorn.run("__main__:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("__main__:app", host="0.0.0.0", port=7676, reload=True)
 
 app = fastapi.FastAPI()
 
 origins = [
     "http://localhost:5173",
+    "http://localhost:5174",
     "https://lyceum.com",
     "http://lyceum.com",
     "https://test.turingon.tech",

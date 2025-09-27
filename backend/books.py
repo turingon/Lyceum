@@ -82,9 +82,9 @@ def get_books_by_token_and_room_and_case(token, room_id, bookcase_id, db: Sessio
     for book in books:
         data = book.model_dump()
         if book.image:
-            data["image"] = base64.b64encode(book.image).decode("utf-8") if book.image else None
-        if book.content:
-            data["content"] = base64.b64encode(book.content).decode("utf-8") if book.content else None
+            data["image"] = (
+                base64.b64encode(book.image).decode("utf-8") if book.image else None
+            )
         books_data.append(data)
     return books_data
 
@@ -252,7 +252,7 @@ def update_book(
 
     db.commit()
     db.refresh(book)
-    return book.model_dump(exclude={"content","image"})
+    return book.model_dump(exclude={"content", "image"})
 
 
 @router.delete("/book/{book_id}")

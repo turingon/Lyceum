@@ -32,6 +32,13 @@ def create_user(user: models.Users, db: Session):
     db.add(user)
     db.commit()
 
+    access_token_expires = timedelta(minutes=1440)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}
+
 
 def get_user_by_name(db: Session, email: str):
     statement = select(models.Users).where(models.Users.email == email)
@@ -39,8 +46,9 @@ def get_user_by_name(db: Session, email: str):
     return user
 
 
-@router.post("/")
+@router.post("/register")
 def register_user(user: models.Users, db: Session = Depends(get_db)):
+    print("enter")
     db_user = get_user_by_name(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="User Already Exist")
@@ -69,7 +77,6 @@ def login_for_access_token(
             detail="Incorrect username or passwrod",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    print("it is authentication")
     access_token_expires = timedelta(minutes=1440)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
@@ -118,5 +125,4 @@ def verify_token(token: str = Depends(oauth2_bearer)):
 @router.get("/verify_token/{token}")
 async def verify_user_token(token: str):
     verify_token(token=token)
-    print("giriyo")
     return {"Message": "Token is valid"}
