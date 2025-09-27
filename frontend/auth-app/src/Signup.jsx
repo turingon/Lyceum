@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import api from "./api";
-import { Link } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -18,17 +17,14 @@ function Login() {
         const response = await fetch(
           `https://lyceumapi.turingon.tech/auth/verify_token/${token}`,
         );
+        console.log(response.ok);
         if (response.ok) {
           navigate("/settings");
         }
         if (!response.ok) {
           throw new Error("Token verification failed");
         }
-      } catch (error) {
-        console.log(error);
-        localStorage.removeItem("token");
-        navigate("/");
-      }
+      } catch (error) { }
     };
     verifyToken();
   }, [navigate]);
@@ -52,17 +48,22 @@ function Login() {
     formDetails.append("password", password);
 
     try {
-      const response = await fetch("https://lyceumapi.turingon.tech/auth/token", {
+      const response = await fetch("https://lyceumapi.turingon.tech/auth/register", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
-        body: formDetails,
+        body: JSON.stringify({
+          email: username, // or whatever your variable is
+          hashed_password: password,
+        }),
       });
 
       setLoading(false);
+      console.log("test" + response.ok);
       if (response.ok) {
         const data = await response.json();
+        console.log(data)
         localStorage.setItem("token", data.access_token);
         navigate("/settings");
       } else {
@@ -97,11 +98,8 @@ function Login() {
           />
         </div>
         <button className="login-button" type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Sign Upping..." : "Sign Up"}
         </button>
-        <p>
-          <a href="/register">Don’t have an account?</a>
-        </p>
         {error && <p className="error-text">{error}</p>}
       </form>
     </div>

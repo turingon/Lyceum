@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./Settings.css";
 import api from "./api";
 import SideNavBar from "./Sidebar";
+import { useNavigate } from "react-router-dom";
+
 function Rooms({ refreshKey, triggerRefresh }) {
   const [rooms, setRooms] = useState([]);
 
@@ -419,7 +421,7 @@ function AddBook({ triggerRefresh }) {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `http://localhost:8000/books/add_book/${token}`,
+        `https://lyceumapi.turingon.tech/books/add_book/${token}`,
         {
           method: "POST",
           body: formData,
@@ -816,6 +818,30 @@ function Settings() {
     if (component === "book") return <Book refreshKey={refreshKey} />;
     return null;
   };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(
+          `https://lyceumapi.turingon.tech/auth/verify_token/${token}`,
+        );
+        if (response.ok) {
+          navigate("/settings");
+        }
+        if (!response.ok) {
+          throw new Error("Token verification failed");
+        }
+      } catch (error) {
+        console.log(error);
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    };
+    verifyToken();
+  }, [navigate]);
 
   const renderMethod = () => {
     if (method === "add_room")

@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 import api from "./api";
-function SideNavBar({refreshKey}) {
+function SideNavBar({ refreshKey }) {
   const [isExpanded, setExpendState] = useState(false);
   const [rooms, setRooms] = useState([]);
   const fetchCases = async () => {
     const token = localStorage.getItem("token");
-    const rooms = await api.get(
-      `http://localhost:8000/books/get_rooms/${token}`,
-    );
+    const rooms = await api.get(`/books/get_rooms/${token}`);
     setRooms(rooms.data);
   };
 
@@ -30,7 +28,7 @@ function SideNavBar({refreshKey}) {
               <div className="nav-brand">
                 <a href="/">
                   {" "}
-                  <img src="../../public/logo.png" />{" "}
+                  <img src="/logo.png" />{" "}
                 </a>
               </div>
             )}

@@ -4,43 +4,63 @@ import "./index.css";
 import Sidebar from "./Sidebar";
 import "./App.css";
 import "./Room.css";
+import { useNavigate } from "react-router-dom";
+
 function Library() {
   const [bookcases, setBookcases] = useState([]);
-  const [booksByBookcase, setBooksByBookcase] = useState({}); // key: bookcaseId
+  const [booksByBookcase, setBooksByBookcase] = useState({});
   const room = localStorage.getItem("current_room");
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBookcases = async () => {
+    const verifyToken = async () => {
       try {
-        const response = await api.get(
-          `/books/get_bookcases/${token}/room/${room}`,
+        const response = await fetch(
+          `https://lyceumapi.turingon.tech/auth/verify_token/${token}`
         );
-        const bookcases = response.data;
+        if (!response.ok) {
+          throw new Error("Token verification failed");
+        }
+      } catch (error) {
+        console.log(error);
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    };
+    verifyToken();
+  }, [navigate, token]);
+
+  useEffect(() => {
+    const fetchBookcasesAndBooks = async () => {
+      try {
+        const res = await api.get(`/books/get_bookcases/${token}/room/${room}`);
+        const bookcases = res.data;
         setBookcases(bookcases);
 
-        // Fetch books for each bookcase
-        for (const bookcase of bookcases) {
-          const booksResponse = await api.get(
-            `/books/get_books/${token}/room/${room}/case/${bookcase.id}`,
-          );
-          setBooksByBookcase((prev) => ({
-            ...prev,
-            [bookcase.id]: booksResponse.data,
-          }));
-        }
+        const booksById = {};
+        await Promise.all(
+          bookcases.map(async (bookcase) => {
+            const booksResponse = await api.get(
+              `/books/get_books/${token}/room/${room}/case/${bookcase.id}`
+            );
+            booksById[bookcase.id] = booksResponse.data;
+          })
+        );
+        setBooksByBookcase(booksById);
       } catch (error) {
         console.error("Error fetching bookcases/books:", error);
       }
     };
 
-    fetchBookcases();
-  }, []);
+    fetchBookcasesAndBooks();
+  }, [room, token]);
+
   const openPdf = (bookId) => {
-    const encodedBookId = encodeURIComponent(bookId);
-    const backendUrl = `http://localhost:8000/books/book/get_pdf/${bookId}`;
+    const backendUrl = `https://lyceumapi.turingon.tech/books/book/get_pdf/${bookId}`;
     window.open(backendUrl, "_blank");
   };
+
   return (
     <div className="grid-container">
       <Sidebar />
@@ -51,8 +71,10 @@ function Library() {
             {(booksByBookcase[bookcase.id] || []).map((book) => (
               <div key={book.id} className="book-container">
                 <img
+                  loading="lazy"
                   src={`data:image/png;base64,${book.image}`}
                   className="book-img"
+                  alt={book.name}
                 />
                 <p className="top-left size">{book.status}</p>
                 <button className="button" onClick={() => openPdf(book.id)}>
